@@ -20,4 +20,4 @@ class TestParsing(IsignBaseTest):
         executable = Executable(bundle, bundle.get_executable_path())
         arch = executable.arches[0]
         codesig_str = str(arch['cmds']['LC_CODE_SIGNATURE'])
-        self.assertEquals(expected_codesig_str, codesig_str)
+        self.assertEqual(expected_codesig_str, codesig_str)

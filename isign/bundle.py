@@ -10,14 +10,14 @@
     See the Apple Developer Documentation "About Bundles" """
 
 import biplist
-import code_resources
-from exceptions import NotMatched
+from . import code_resources
+from .exceptions import NotMatched
 import copy
 import glob
 import logging
 import os
 from os.path import basename, exists, join, splitext
-import signable
+from . import signable
 import shutil
 
 
@@ -81,7 +81,7 @@ class Bundle(object):
                     url_type['CFBundleURLName'] = new_bundle_id
                     changed = True
 
-        for key, val in new_props.iteritems():
+        for key, val in new_props.items():
             is_new_key = key not in self.info
             if is_new_key or self.info[key] != val:
                 if is_new_key:

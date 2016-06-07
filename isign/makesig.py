@@ -10,8 +10,8 @@
 import construct
 import hashlib
 import math
-import macho
-import macho_cs
+from . import macho
+from . import macho_cs
 
 
 def make_arg(data_type, arg):
@@ -201,7 +201,7 @@ def make_signature(arch_macho, arch_end, cmds, f, entitlements_file):
     #log.debug("new cL:", codeLimit)
     nCodeSlots = int(math.ceil(float(end_offset - start_offset) / 0x1000))
     #log.debug("new nCS:", nCodeSlots)
-    for i in xrange(nCodeSlots):
+    for i in range(nCodeSlots):
         f.seek(start_offset + 0x1000 * i)
         actual_data = f.read(min(0x1000, end_offset - f.tell()))
         actual = hashlib.sha1(actual_data).digest()

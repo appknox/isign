@@ -1,6 +1,6 @@
-import archive
+from . import archive
 # import makesig
-import exceptions
+from . import exceptions
 import os
 from os.path import dirname, exists, join, realpath
 

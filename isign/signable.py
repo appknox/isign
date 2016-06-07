@@ -6,23 +6,21 @@
 #
 
 from abc import ABCMeta
-from codesig import (Codesig,
+from .codesig import (Codesig,
                      EntitlementsSlot,
                      ResourceDirSlot,
                      RequirementsSlot,
                      ApplicationSlot,
                      InfoSlot)
 import logging
-import macho
-from makesig import make_signature
+from . import macho
+from .makesig import make_signature
 import os
 import tempfile
 
 log = logging.getLogger(__name__)
 
-class Signable(object):
-    __metaclass__ = ABCMeta
-
+class Signable(object, metaclass=ABCMeta):
     slot_classes = []
 
     def __init__(self, bundle, path):
