@@ -7,17 +7,16 @@
 
 
 from construct import *
-import biplist
-from isign.utils import decode_dict
+import plistlib
 
 
 class PlistAdapter(Adapter):
     def _encode(self, obj, context):
-        return biplist.writePlistToString(obj)
+        return plistlib.dumps(obj)
+
 
     def _decode(self, obj, context):
-        blist = biplist.readPlistFromString(obj)
-        return decode_dict(blist)
+        return plistlib.dumps(obj)
 
 
 # talk about overdesign.

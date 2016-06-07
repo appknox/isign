@@ -3,7 +3,6 @@
     common interface to extract these apps to a temp file, then resign them,
     and create an archive of the same type """
 
-import biplist
 from .bundle import App, Bundle, is_info_plist_native
 from .exceptions import NotSignable, NotMatched
 from distutils import spawn
@@ -16,7 +15,7 @@ from subprocess import call
 from .signer import Signer
 import shutil
 import zipfile
-from isign.utils import decode_dict
+import plistlib
 
 
 REMOVE_WATCHKIT = True
@@ -116,8 +115,7 @@ class AppZip(object):
                 relative_app_dir = apps.pop()
                 plist_path = join(relative_app_dir, "Info.plist")
                 plist_bytes = z.read(plist_path)
-                plist = biplist.readPlistFromString(plist_bytes)
-                plist = decode_dict(plist)
+                plist = plistlib.loads(plist_bytes)
                 is_native = is_info_plist_native(plist)
                 log.debug("is_native: {}".format(is_native))
             if len(apps) > 1:

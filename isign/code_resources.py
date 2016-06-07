@@ -4,10 +4,8 @@ import hashlib
 import logging
 from memoizer import memoize
 import os
-import biplist
-# from biplist import PlistWriter
+import plistlib
 import re
-from isign.utils import decode_dict
 
 OUTPUT_DIRECTORY = '_CodeSignature'
 OUTPUT_FILENAME = 'CodeResources'
@@ -145,7 +143,7 @@ class ResourceBuilder(object):
                     continue
 
                 # the Data element in plists is base64-encoded
-                val = {'hash': biplist.Data(get_hash_binary(path))}
+                val = {'hash': plistlib.Data(get_hash_binary(path))}
 
                 if rule.is_optional():
                     val['optional'] = True
@@ -177,7 +175,7 @@ def get_template():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     template_path = os.path.join(current_dir, TEMPLATE_FILENAME)
     # fh = open(template_path, 'r')
-    return decode_dict(biplist.readPlist(template_path))
+    return plistlib.readPlist(template_path)
 
 
 @memoize
@@ -205,7 +203,7 @@ def write_plist(target_dir, plist):
         os.makedirs(output_dir)
     output_path = os.path.join(output_dir, OUTPUT_FILENAME)
     # fh = open(output_path, 'w')
-    biplist.writePlist(plist, output_path)
+    plistlib.writePlist(plist, output_path)
     return output_path
 
 
