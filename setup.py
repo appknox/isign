@@ -19,7 +19,11 @@ else:  # source package
                 version = line.split(":")[1].strip()
             elif line.startswith("Name:"):
                 package_name = line.split(":")[1].strip()
+
+package_name = "ak-isign"
+version = "0.9"
 package = package_name.replace('-', '_')
+
 
 setup(
     name=package_name,
