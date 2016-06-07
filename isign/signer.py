@@ -13,6 +13,7 @@ import os
 import os.path
 import subprocess
 import re
+from isign.utils import decode_dict
 
 OPENSSL = os.getenv('OPENSSL', spawn.find_executable('openssl'))
 # modern OpenSSL versions look like '0.9.8zd'. Use a regex to parse
@@ -125,7 +126,8 @@ class Signer(object):
         with open(self.signer_cert_file, 'rb') as fh:
             cert = crypto.load_certificate(crypto.FILETYPE_PEM, fh.read())
         subject = cert.get_subject()
-        return dict(subject.get_components())['CN']
+        components = dict(subject.get_components())
+        return decode_dict(components)['CN']
 
     def _log_parsed_asn1(self, data):
         cmd = ['asn1parse', '-inform', 'DER' '-i']
