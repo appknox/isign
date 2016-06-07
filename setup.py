@@ -40,7 +40,7 @@ setup(
     keywords=['ios', 'app', 'signature', 'codesign', 'sign', 'resign'],
     packages=find_packages(),
     install_requires=[
-        'biplist==0.9',
+        # 'biplist==0.9',
         'construct==2.5.2',
         'memoizer==0.0.1',
         'pyOpenSSL==0.15.1'
