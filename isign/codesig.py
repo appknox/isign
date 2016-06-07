@@ -254,7 +254,7 @@ class Codesig(object):
                 if len(self.construct.data.BlobIndex) <= i + 1 or self.construct.data.BlobIndex[i + 1].blob.magic != 'CSMAGIC_BLOBWRAPPER':
                     # There's no following blobwrapper
                     raise Exception("Could not find blob wrapper!")
-                
+
                 del self.construct.data.BlobIndex[i]
                 removed = 1
                 # CSMAGIC_BLOBWRAPPER is now at index i
@@ -266,7 +266,7 @@ class Codesig(object):
                         removed += 1
 
                 self.construct.data.count -= removed
-                        
+
             elif len(codedirs) > 2:
                 raise Exception("Too many code directories (%d)" % len(codedirs))
 
@@ -280,7 +280,7 @@ class Codesig(object):
         self.set_codedirectory(bundle.seal_path, bundle.info_path, signer)
         self.set_signature(signer)
         self.update_offsets()
-        
+
     # TODO make this optional, in case we want to check hashes or something
     # log.debug(hashes)
     # cd = codesig_cons.data.BlobIndex[0].blob.data

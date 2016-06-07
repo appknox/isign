@@ -28,8 +28,7 @@ def decode_dict(source):
         return decode_list
     target = {}
     for key, value in source.items():
-        if type(key) == bytes:
-            key = key.decode()
+        key = decode_dict(key)
         value = decode_dict(value)
         target[key] = value
     return target
