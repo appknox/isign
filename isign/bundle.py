@@ -19,7 +19,7 @@ import os
 from os.path import basename, exists, join, splitext
 from . import signable
 import shutil
-
+from isign.utils import decode_dict
 
 log = logging.getLogger(__name__)
 
@@ -44,6 +44,7 @@ class Bundle(object):
         if not exists(self.info_path):
             raise NotMatched("no Info.plist found; probably not a bundle")
         self.info = biplist.readPlist(self.info_path)
+        self.info  = decode_dict(self.info)
         self.orig_info = None
         if not is_info_plist_native(self.info):
             raise NotMatched("not a native iOS bundle")
@@ -139,7 +140,7 @@ class Bundle(object):
                 plist_path = join(appex_path, 'Info.plist')
                 if not exists(plist_path):
                     continue
-                plist = biplist.readPlist(plist_path)
+                plist = decode_dict(biplist.readPlist(plist_path))
                 appex_exec_path = join(appex_path, plist['CFBundleExecutable'])
                 appex = signable.Appex(self, appex_exec_path)
                 appex.sign(self, signer)

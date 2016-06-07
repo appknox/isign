@@ -16,6 +16,7 @@ from subprocess import call
 from .signer import Signer
 import shutil
 import zipfile
+from isign.utils import decode_dict
 
 
 REMOVE_WATCHKIT = True
@@ -116,6 +117,7 @@ class AppZip(object):
                 plist_path = join(relative_app_dir, "Info.plist")
                 plist_bytes = z.read(plist_path)
                 plist = biplist.readPlistFromString(plist_bytes)
+                plist = decode_dict(plist)
                 is_native = is_info_plist_native(plist)
                 log.debug("is_native: {}".format(is_native))
             if len(apps) > 1:

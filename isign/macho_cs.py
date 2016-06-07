@@ -7,15 +7,18 @@
 
 
 from construct import *
-import plistlib
+import biplist
+from isign.utils import decode_dict
 
 
 class PlistAdapter(Adapter):
     def _encode(self, obj, context):
-        return plistlib.writePlistToString(obj)
+        return biplist.writePlistToString(obj)
 
     def _decode(self, obj, context):
-        return plistlib.readPlistFromString(obj)
+        blist = biplist.readPlistFromString(obj)
+        return decode_dict(blist)
+
 
 # talk about overdesign.
 # magic is in the blob struct
