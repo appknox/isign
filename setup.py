@@ -21,7 +21,7 @@ else:  # source package
                 package_name = line.split(":")[1].strip()
 
 package_name = "ak-isign"
-version = "0.9.1"
+version = "0.9.2"
 package = package_name.replace('-', '_')
 
 
