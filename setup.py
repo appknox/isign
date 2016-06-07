@@ -21,7 +21,7 @@ else:  # source package
                 package_name = line.split(":")[1].strip()
 
 package_name = "ak-isign"
-version = "0.9.2"
+version = "0.9.3"
 package = package_name.replace('-', '_')
 
 
@@ -50,7 +50,7 @@ setup(
         'pyOpenSSL==0.15.1'
     ],
     package_data={
-        package: ['apple_credentials/applecerts.pem',
+        'isign': ['apple_credentials/applecerts.pem',
                   'code_resources_template.xml',
                   'version.json'],
     },
