@@ -5,7 +5,7 @@ import logging
 from memoizer import memoize
 import os
 import plistlib
-from plistlib import PlistWriter
+# from plistlib import PlistWriter
 import re
 
 OUTPUT_DIRECTORY = '_CodeSignature'
@@ -22,6 +22,8 @@ log = logging.getLogger(__name__)
 # Apple's plist utils work like this:
 #   1234.5 --->  <real>1234.5</real>
 #   1234.0 --->  <real>1234</real>
+
+"""
 def writeValue(self, value):
     if isinstance(value, float):
         rep = repr(value)
@@ -33,6 +35,7 @@ def writeValue(self, value):
 
 PlistWriter.oldWriteValue = PlistWriter.writeValue
 PlistWriter.writeValue = writeValue
+"""
 
 
 # Simple reimplementation of ResourceBuilder, in the Apple Open Source

@@ -25,7 +25,8 @@ class TestVersusApple(IsignBaseTest):
         proc = subprocess.Popen(cmd,
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.STDOUT)
-        out, _ = proc.communicate()
+        out, err = proc.communicate()
+        out, err = out.decode(), err.decode()
         assert proc.returncode == 0, "Return code not 0"
         return self.codesign_display_parse(out)
 
@@ -143,7 +144,8 @@ class TestVersusApple(IsignBaseTest):
         # assert 'Apple Root CA' in authorities
 
         assert 'Info.plist' in info
-        assert self.get_dict_with_key(info['Info.plist'], 'entries') is not None
+        assert self.get_dict_with_key(
+            info['Info.plist'], 'entries') is not None
 
         assert 'TeamIdentifier' in info
         # TODO get this from an arg
@@ -205,7 +207,8 @@ class TestVersusApple(IsignBaseTest):
         if platform.system() != 'Darwin' or CODESIGN_BIN is None:
             raise SkipTest
 
-        # resign the test app that has frameworks, extract it to a temp directory
+        # resign the test app that has frameworks,
+        # extract it to a temp directory
         working_dir = tempfile.mkdtemp()
         resigned_ipa_path = join(working_dir, 'resigned.ipa')
         self.resign(self.TEST_WITH_FRAMEWORKS_IPA,
@@ -227,7 +230,8 @@ class TestVersusApple(IsignBaseTest):
         self.check_dylib(dylib_path)
 
         # Now we do similar tests for a framework
-        framework_path = join(app_path, 'Frameworks', 'FontAwesome_swift.framework')
+        framework_path = join(
+            app_path, 'Frameworks', 'FontAwesome_swift.framework')
         self.check_bundle(framework_path)
 
         shutil.rmtree(working_dir)

@@ -35,6 +35,7 @@ def openssl_command(args, data=None):
     if data is not None:
         proc.stdin.write(data)
     out, err = proc.communicate()
+    out, err = out.decode(), err.decode()
     if err is not None and err != '':
         log.error("Command `{0}` returned error:\n{1}".format(cmd_str, err))
     if proc.returncode != 0:

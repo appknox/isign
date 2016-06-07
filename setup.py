@@ -10,7 +10,7 @@ if path.exists(path.join(here, "version.sh")):  # development
     if 'PYTHON_PACKAGE_VERSION' in environ:
         version = environ['PYTHON_PACKAGE_VERSION']
     else:
-        version = check_output(path.join(here, "version.sh")).strip()
+        version = check_output(path.join(here, "version.sh")).decode().strip()
     package_name = path.basename(here)
 else:  # source package
     with open(path.join(here, "PKG-INFO")) as f:
@@ -26,7 +26,8 @@ setup(
     version=version,
     description='Re-signing iOS apps without Apple tools',
     url='https://github.com/saucelabs/{}'.format(package_name),
-    download_url='https://github.com/saucelabs/{}/tarball/v{}'.format(package_name, version),
+    download_url='https://github.com/saucelabs/{}/tarball/v{}'.format(
+        package_name, version),
     author='Sauce Labs',
     author_email='dev@saucelabs.com',
     classifiers=[
