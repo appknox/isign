@@ -189,6 +189,10 @@ class App(Bundle):
 
     def create_entitlements(self, team_id):
         bundle_id = self.info['CFBundleIdentifier']
+        if isinstance(team_id, bytes):
+            team_id = team_id.decode()
+        if isinstance(bundle_id, bytes):
+            bundle_id = s.decode()
         entitlements = {
             "keychain-access-groups": [team_id + '.' + bundle_id],
             "com.apple.developer.team-identifier": team_id,

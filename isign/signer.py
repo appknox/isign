@@ -17,7 +17,7 @@ from isign.utils import decode_dict
 
 OPENSSL = os.getenv('OPENSSL', spawn.find_executable('openssl'))
 # modern OpenSSL versions look like '0.9.8zd'. Use a regex to parse
-OPENSSL_VERSION_RE = re.compile(r'(\d+).(\d+).(\d+)(\w*)')
+OPENSSL_VERSION_RE = re.compile(b'(\d+).(\d+).(\d+)(\w*)')
 MINIMUM_OPENSSL_VERSION = '1.0.1'
 
 log = logging.getLogger(__name__)
@@ -36,8 +36,8 @@ def openssl_command(args, data=None):
     if data is not None:
         proc.stdin.write(data)
     out, err = proc.communicate()
-    out, err = out.decode(), err.decode()
-    if err is not None and err != '':
+    # out, err = out.decode(), err.decode()
+    if err is not None and err != b'':
         log.error("Command `{0}` returned error:\n{1}".format(cmd_str, err))
     if proc.returncode != 0:
         msg = "openssl command `{0}` failed, see log for error".format(cmd_str)
@@ -48,7 +48,7 @@ def openssl_command(args, data=None):
 def get_installed_openssl_version():
     version_line = openssl_command(['version'])
     # e.g. 'OpenSSL 0.9.8zd 8 Jan 2015'
-    return re.split(r'\s+', version_line)[1]
+    return re.split(b'\s+', version_line)[1]
 
 
 def is_openssl_version_ok(version, minimum):
@@ -61,6 +61,8 @@ def is_openssl_version_ok(version, minimum):
 def openssl_version_to_tuple(s):
     """ OpenSSL uses its own versioning scheme, so we convert to tuple,
         for easier comparison """
+    if isinstance(s, str):
+        s = s.encode()
     search = re.search(OPENSSL_VERSION_RE, s)
     if search is not None:
         return search.groups()
@@ -144,7 +146,7 @@ class Signer(object):
             '-noout'
         ]
         certificate_info = openssl_command(cmd)
-        subject_with_ou_match = re.compile(r'\s+Subject:.*OU=(\w+)')
+        subject_with_ou_match = re.compile(b'\s+Subject:.*OU=(\w+)')
         for line in certificate_info.splitlines():
             match = subject_with_ou_match.match(line)
             if match is not None:

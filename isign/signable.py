@@ -91,7 +91,7 @@ class Signable(object, metaclass=ABCMeta):
         # log.debug("new codesig len: {0}".format(new_codesig_len))
 
         padding_length = arch['codesig_len'] - new_codesig_len
-        new_codesig_data += "\x00" * padding_length
+        new_codesig_data += b"\x00" * padding_length
         # log.debug("padded len: {0}".format(len(new_codesig_data)))
         # log.debug("----")
 
