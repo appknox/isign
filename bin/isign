@@ -112,7 +112,7 @@ if __name__ == '__main__':
     if args.display_only:
         import json
         bundle_info = isign.view(args.app_paths[0])
-        print json.dumps(bundle_info, indent=4, separators=(',', ': '))
+        print(json.dumps(bundle_info, indent=4, separators=(',', ': ')))
     else:
         # Filter out args that don't matter to the
         # resign call, like verbosity or help
