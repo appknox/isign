@@ -32,6 +32,7 @@ class ApplicationSlot(CodeDirectorySlot):
     def get_hash(self):
         return '\x00' * 20
 
+
 class ResourceDirSlot(CodeDirectorySlot):
     offset = -3
 
@@ -58,10 +59,9 @@ class InfoSlot(CodeDirectorySlot):
     def get_contents(self):
         return open(self.info_path, "rb").read()
 
-#
+
 # Represents a code signature object, aka the LC_CODE_SIGNATURE,
 # within the Signable
-#
 class Codesig(object):
     """ wrapper around construct for code signature """
     def __init__(self, signable, data):
@@ -197,9 +197,18 @@ class Codesig(object):
 
         cd = self.get_codedirectory()
         cd.data.teamID = signer.team_id
-        if self.signable.get_changed_bundle_id():
-            cd.data.ident = self.signable.get_changed_bundle_id()
-
+        
+        changed_bundle_id = self.signable.get_changed_bundle_id()
+        if changed_bundle_id:
+            offset_change = len(changed_bundle_id) - len(cd.data.ident)
+            cd.data.ident = changed_bundle_id
+            cd.data.hashOffset += offset_change
+            if cd.data.teamIDOffset == None:
+                cd.data.teamIDOffset = offset_change
+            else:
+                cd.data.teamIDOffset += offset_change
+            cd.length += offset_change
+            
         cd.bytes = macho_cs.CodeDirectory.build(cd.data)
         # cd_data = macho_cs.Blob_.build(cd)
         # log.debug(len(cd_data))
@@ -251,7 +260,8 @@ class Codesig(object):
             if len(codedirs) == 2:
                 # Remove the sha256 code directory
                 i = codedirs.pop()
-                if len(self.construct.data.BlobIndex) <= i + 1 or self.construct.data.BlobIndex[i + 1].blob.magic != 'CSMAGIC_BLOBWRAPPER':
+                if (len(self.construct.data.BlobIndex) <= i + 1 or
+                        self.construct.data.BlobIndex[i + 1].blob.magic != 'CSMAGIC_BLOBWRAPPER'):
                     # There's no following blobwrapper
                     raise Exception("Could not find blob wrapper!")
 

@@ -142,21 +142,16 @@ class AppZip(object):
         # to construct the zip file. This is the best way to ensure the an unused
         # filename. Also, `zip` won't overwrite existing files, so this is safer.
         temp_zip_dir = None
-        old_cwd = None
         try:
             # need to chdir and use relative paths, because zip is stupid
-            old_cwd = os.getcwd()
-            os.chdir(containing_dir)
             temp_zip_dir = tempfile.mkdtemp(prefix="isign-zip-")
             temp_zip_file = join(temp_zip_dir, 'temp.zip')
-            call([get_helper('zip'), "-qr", temp_zip_file, "."])
+            call([get_helper('zip'), "-qr", temp_zip_file, "."], cwd=containing_dir)
             shutil.move(temp_zip_file, output_path)
             log.info("archived %s to %s" % (cls.__name__, output_path))
         finally:
             if temp_zip_dir is not None and isdir(temp_zip_dir):
                 shutil.rmtree(temp_zip_dir)
-            if old_cwd is not None and isdir(old_cwd):
-                os.chdir(old_cwd)
 
 
 class Ipa(AppZip):
@@ -232,6 +227,24 @@ def process_watchkit(root_bundle_path, should_remove=False):
             raise NotSignable("Cannot yet sign WatchKit bundles")
 
 
+def view(input_path):
+    if not exists(input_path):
+        raise IOError("{0} not found".format(input_path))
+    temp_dir = None
+    bundle_info = None
+    try:
+        archive = archive_factory(input_path)
+        (temp_dir, bundle) = archive.unarchive_to_temp()
+        bundle_info = bundle.info
+    except NotSignable as e:
+        log.info("Could not read: <{0}>: {1}\n".format(input_path, e))
+        raise
+    finally:
+        if temp_dir is not None and isdir(temp_dir):
+            shutil.rmtree(temp_dir)
+    return bundle_info
+
+
 def resign(input_path,
            certificate,
            key,
@@ -251,6 +264,7 @@ def resign(input_path,
                     apple_cert_file=apple_cert)
 
     temp_dir = None
+    bundle_info = None
     try:
         archive = archive_factory(input_path)
         (temp_dir, bundle) = archive.unarchive_to_temp()
@@ -259,6 +273,7 @@ def resign(input_path,
             bundle.update_info_props(info_props)
         process_watchkit(bundle.path, REMOVE_WATCHKIT)
         bundle.resign(signer, provisioning_profile)
+        bundle_info = bundle.info
         archive.__class__.archive(temp_dir, output_path)
     except NotSignable as e:
         msg = "Not signable: <{0}>: {1}\n".format(input_path, e)
@@ -267,3 +282,4 @@ def resign(input_path,
     finally:
         if temp_dir is not None and isdir(temp_dir):
             shutil.rmtree(temp_dir)
+    return bundle_info

@@ -68,8 +68,11 @@ class Bundle(object):
             self.orig_info = copy.deepcopy(self.info)
 
         changed = False
-        if 'CFBundleIdentifier' in new_props and 'CFBundleURLTypes' in self.info and 'CFBundleURLTypes' not in new_props:
-            # The bundle identifier changed. Check CFBundleURLTypes for CFBundleURLName values matching the old bundle
+        if ('CFBundleIdentifier' in new_props and
+                'CFBundleURLTypes' in self.info and
+                'CFBundleURLTypes' not in new_props):
+            # The bundle identifier changed. Check CFBundleURLTypes for
+            # CFBundleURLName values matching the old bundle
             # id if it's not being set explicitly
             old_bundle_id = self.info['CFBundleIdentifier']
             new_bundle_id = new_props['CFBundleIdentifier']
@@ -94,7 +97,7 @@ class Bundle(object):
             self.orig_info = None
 
     def info_props_changed(self):
-        return self.orig_info != None
+        return self.orig_info is not None
 
     def info_prop_changed(self, key):
         if not self.orig_info:
@@ -106,6 +109,12 @@ class Bundle(object):
 
     def get_info_prop(self, key):
         return self.info[key]
+
+    def sign_dylibs(self, signer, path):
+        """ Sign all the dylibs in this directory """
+        for dylib_path in glob.glob(join(path, '*.dylib')):
+            dylib = signable.Dylib(self, dylib_path)
+            dylib.sign(self, signer)
 
     def sign(self, signer):
         """ Sign everything in this bundle, recursively with sub-bundles """
@@ -124,11 +133,11 @@ class Bundle(object):
                 except NotMatched:
                     # log.debug("not a framework: %s" % framework_path)
                     continue
-            # sign all the dylibs
-            dylib_paths = glob.glob(join(frameworks_path, '*.dylib'))
-            for dylib_path in dylib_paths:
-                dylib = signable.Dylib(self, dylib_path)
-                dylib.sign(self, signer)
+            # sign all the dylibs under Frameworks
+            self.sign_dylibs(signer, frameworks_path)
+
+        # sign any dylibs in the main directory (rare, but it happens)
+        self.sign_dylibs(signer, self.path)
 
         plugins_path = join(self.path, 'PlugIns')
         if exists(plugins_path):
@@ -168,6 +177,7 @@ class Framework(Bundle):
 
     def __init__(self, path):
         super(Framework, self).__init__(path)
+
 
 class App(Bundle):
     """ The kind of bundle that is visible as an app to the user.

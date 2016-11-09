@@ -20,6 +20,7 @@ import tempfile
 
 log = logging.getLogger(__name__)
 
+
 class Signable(object, metaclass=ABCMeta):
     slot_classes = []
 
@@ -149,6 +150,9 @@ class Signable(object, metaclass=ABCMeta):
         macho.MachoFile.build_stream(self.m, temp)
         temp.close()
 
+        # make copy have same permissions
+        mode = os.stat(self.path).st_mode
+        os.chmod(temp.name, mode)
         # log.debug("moving temporary file to {0}".format(self.path))
         os.rename(temp.name, self.path)
 
@@ -161,6 +165,7 @@ class Executable(Signable):
                     ApplicationSlot,
                     InfoSlot]
 
+
 class Dylib(Signable):
     """ A dynamic library that isn't part of its own bundle, e.g.
         the Swift libraries.
@@ -171,6 +176,7 @@ class Dylib(Signable):
     """
     slot_classes = [EntitlementsSlot,
                     RequirementsSlot]
+
 
 class Appex(Signable):
     """ An app extension  """
