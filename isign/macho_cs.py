@@ -4,18 +4,23 @@
 # libraries, can be used for parsing or emitting
 # (Construct calls it 'building')
 #
-
-
 from construct import *
-import plistlib
+
+from .utils import PY3
+if PY3:
+    from plistlib import writePlistToBytes as plist_to_data
+    from plistlib import readPlistFromBytes as plist_from_data
+else:
+    from plistlib import writePlistToString as plist_to_data
+    from plistlib import readPlistFromString as plist_from_data
 
 
 class PlistAdapter(Adapter):
     def _encode(self, obj, context):
-        return plistlib.writePlistToString(obj)
+        return plist_to_data(obj)
 
     def _decode(self, obj, context):
-        return plistlib.readPlistFromString(obj)
+        return plist_from_data(obj)
 
 # talk about overdesign.
 # magic is in the blob struct

@@ -1,9 +1,11 @@
-from os.path import isdir
-import isign
-from archive import archive_factory
-from signer import Signer
+import os
 import logging
 import multiprocessing
+
+from . import isign
+from .archive import archive_factory
+from .signer import Signer
+
 
 log = logging.getLogger(__name__)
 
@@ -125,7 +127,7 @@ def multisign_archive(archive, cred_dirs_to_output_paths, info_props=None):
         raise
 
     finally:
-        if ua is not None and isdir(ua.path):
+        if ua is not None and os.path.isdir(ua.path):
             ua.remove()
 
     return results

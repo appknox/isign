@@ -7,11 +7,16 @@
 # we may need this someday, so preserving here.
 #
 
-import construct
 import hashlib
+import logging
 import math
-import macho
-import macho_cs
+
+import construct
+
+from . import macho, macho_cs
+
+
+log = logging.getLogger(__name__)
 
 
 def make_arg(data_type, arg):
@@ -201,7 +206,7 @@ def make_signature(arch_macho, arch_end, cmds, f, entitlements_file):
     #log.debug("new cL:", codeLimit)
     nCodeSlots = int(math.ceil(float(end_offset - start_offset) / 0x1000))
     #log.debug("new nCS:", nCodeSlots)
-    for i in xrange(nCodeSlots):
+    for i in range(nCodeSlots):
         f.seek(start_offset + 0x1000 * i)
         actual_data = f.read(min(0x1000, end_offset - f.tell()))
         actual = hashlib.sha1(actual_data).digest()
@@ -223,4 +228,3 @@ def make_signature(arch_macho, arch_end, cmds, f, entitlements_file):
     arch_macho.ncmds += 1
     arch_macho.sizeofcmds += len(macho.LoadCommand.build(cmd))
     cmds['LC_CODE_SIGNATURE'] = cmd
-

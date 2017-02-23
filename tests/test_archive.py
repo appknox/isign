@@ -1,5 +1,6 @@
 from isign_base_test import IsignBaseTest
 from isign.archive import archive_factory, Archive, AppArchive, AppZipArchive, IpaArchive
+from isign.utils import PY3
 import logging
 
 log = logging.getLogger(__name__)
@@ -45,7 +46,10 @@ class TestBundleInfo(IsignBaseTest):
         archive = archive_factory(filename)
         assert archive is not None
         assert archive.bundle_info is not None
-        assert archive.bundle_info['CFBundleName'] == 'isignTestApp'
+        if PY3:
+            assert archive.bundle_info[b'CFBundleName'] == b'isignTestApp'
+        else:
+            assert archive.bundle_info['CFBundleName'] == 'isignTestApp'
 
     def test_app_archive_info(self):
         self._test_bundle_info(self.TEST_APP)

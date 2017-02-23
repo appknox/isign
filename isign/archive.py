@@ -4,19 +4,22 @@
     and create an archive of the same type """
 
 import abc
-import biplist
-from bundle import App, Bundle, is_info_plist_native
-from exceptions import MissingHelpers, NotSignable, NotMatched
-from distutils import spawn
 import logging
 import os
-from os.path import abspath, dirname, exists, isdir, isfile, join, normpath
-import tempfile
-import re
-from subprocess import call
-from signer import Signer
 import shutil
+import re
+import tempfile
 import zipfile
+from distutils import spawn
+from os.path import abspath, dirname, exists, isdir, isfile, join, normpath
+from subprocess import call
+
+import biplist
+
+from .utils import with_metaclass
+from .bundle import App, Bundle, is_info_plist_native
+from .exceptions import MissingHelpers, NotMatched, NotSignable
+from .signer import Signer
 
 
 REMOVE_WATCHKIT = True
@@ -81,11 +84,7 @@ def process_watchkit(root_bundle_path, should_remove=False):
             raise NotSignable("Cannot yet sign WatchKit bundles")
 
 
-class Archive(object):
-    __metaclass__ = abc.ABCMeta
-    # we use abc.abstractmethod throughout because there are certain class
-    # methods we want to ensure are implemented.
-
+class Archive(with_metaclass(abc.ABCMeta)):
     @abc.abstractmethod
     def unarchive_to_temp(self):
         """ Unarchive and copy to a temp directory """

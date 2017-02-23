@@ -9,17 +9,19 @@
 
     See the Apple Developer Documentation "About Bundles" """
 
-import biplist
-import code_resources
-from exceptions import NotMatched
-import copy
 import glob
 import logging
 import os
-from os.path import basename, exists, join, splitext
-from signer import openssl_command
-import signable
 import shutil
+import copy
+from os.path import basename, exists, join, splitext
+
+import biplist
+
+from . import code_resources, signable
+from .exceptions import NotMatched
+from .signer import openssl_command
+from .utils import PY3
 
 
 log = logging.getLogger(__name__)
@@ -27,10 +29,12 @@ log = logging.getLogger(__name__)
 
 def is_info_plist_native(plist):
     """ If an bundle is for native iOS, it has these properties in the Info.plist """
-    return (
-        'CFBundleSupportedPlatforms' in plist and
-        'iPhoneOS' in plist['CFBundleSupportedPlatforms']
-    )
+    key = 'CFBundleSupportedPlatforms'
+    value = 'iPhoneOS'
+    if PY3:
+        key = key.encode()
+        value = value.encode()
+    return key in plist and value in plist[key]
 
 
 class Bundle(object):
@@ -85,7 +89,7 @@ class Bundle(object):
                     url_type['CFBundleURLName'] = new_bundle_id
                     changed = True
 
-        for key, val in new_props.iteritems():
+        for key, val in new_props.items():
             is_new_key = key not in self.info
             if is_new_key or self.info[key] != val:
                 if is_new_key:

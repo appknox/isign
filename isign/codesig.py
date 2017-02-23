@@ -1,16 +1,19 @@
-from abc import ABCMeta
-import construct
 import hashlib
 import logging
-import macho_cs
+import abc
+
+import construct
+
+from . import macho_cs
+from .utils import with_metaclass
+
 
 log = logging.getLogger(__name__)
 
 
 # See the documentation for an explanation of how
 # CodeDirectory slots work.
-class CodeDirectorySlot(object):
-    __metaclass__ = ABCMeta
+class CodeDirectorySlot(with_metaclass(abc.ABCMeta)):
     offset = None
 
     def __init__(self, codesig):
@@ -198,7 +201,7 @@ class Codesig(object):
 
         cd = self.get_codedirectory()
         cd.data.teamID = signer.team_id
-        
+
         changed_bundle_id = self.signable.get_changed_bundle_id()
         if changed_bundle_id:
             offset_change = len(changed_bundle_id) - len(cd.data.ident)
@@ -209,7 +212,7 @@ class Codesig(object):
             else:
                 cd.data.teamIDOffset += offset_change
             cd.length += offset_change
-            
+
         cd.bytes = macho_cs.CodeDirectory.build(cd.data)
         # cd_data = macho_cs.Blob_.build(cd)
         # log.debug(len(cd_data))
@@ -271,7 +274,7 @@ class Codesig(object):
                 # CSMAGIC_BLOBWRAPPER is now at index i
 
                 # Remove any previous CSMAGIC_BLOBWRAPPERs, the last one is at the expected position
-                for j in reversed(xrange(i)):
+                for j in reversed(range(i)):
                     if self.construct.data.BlobIndex[j].blob.magic == 'CSMAGIC_BLOBWRAPPER':
                         del self.construct.data.BlobIndex[j]
                         removed += 1

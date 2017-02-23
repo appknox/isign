@@ -10,7 +10,7 @@ if path.exists(path.join(here, "version.sh")):  # development
     if 'PYTHON_PACKAGE_VERSION' in environ:
         version = environ['PYTHON_PACKAGE_VERSION']
     else:
-        version = check_output(path.join(here, "version.sh")).strip()
+        version = check_output(path.join(here, "version.sh")).decode().strip()
     package_name = path.basename(here)
 else:  # source package
     with open(path.join(here, "PKG-INFO")) as f:

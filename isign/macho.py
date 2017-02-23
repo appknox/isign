@@ -8,7 +8,7 @@
 
 
 from construct import *
-from macho_cs import Blob
+from .macho_cs import Blob
 
 UInt32 = ULInt32
 

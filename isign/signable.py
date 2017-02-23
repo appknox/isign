@@ -5,25 +5,21 @@
 # Executable, dylib, or framework.
 #
 
-from abc import ABCMeta
-from codesig import (Codesig,
-                     EntitlementsSlot,
-                     ResourceDirSlot,
-                     RequirementsSlot,
-                     ApplicationSlot,
-                     InfoSlot)
+import abc
 import logging
-import macho
-# from makesig import make_signature
 import os
 import tempfile
+
+from . import macho
+from .codesig import (ApplicationSlot, Codesig, EntitlementsSlot, InfoSlot,
+    RequirementsSlot, ResourceDirSlot)
+from .utils import with_metaclass
+
 
 log = logging.getLogger(__name__)
 
 
-class Signable(object):
-    __metaclass__ = ABCMeta
-
+class Signable(with_metaclass(abc.ABCMeta)):
     slot_classes = []
 
     def __init__(self, bundle, path):
@@ -95,7 +91,7 @@ class Signable(object):
         # log.debug("new codesig len: {0}".format(new_codesig_len))
 
         padding_length = arch['codesig_len'] - new_codesig_len
-        new_codesig_data += "\x00" * padding_length
+        new_codesig_data += b"\x00" * padding_length
         # log.debug("padded len: {0}".format(len(new_codesig_data)))
         # log.debug("----")
 

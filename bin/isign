@@ -119,7 +119,7 @@ def filter_args(args, interested):
     # We want the unused command line args to be
     # missing in kwargs, so the defaults are used
     kwargs = {}
-    for k, v in vars(args).iteritems():
+    for k, v in vars(args).items():
         if k in interested and v is not None:
             kwargs[k] = v
     return kwargs
@@ -138,7 +138,7 @@ if __name__ == '__main__':
         # Only show information
         import json
         bundle_info = isign.view(args.app_paths[0])
-        print json.dumps(bundle_info, indent=4, separators=(',', ': '))
+        print(json.dumps(bundle_info, indent=4, separators=(',', ': ')))
 
     else:
         # Handle the various kinds of resign operations
@@ -164,7 +164,7 @@ if __name__ == '__main__':
             # First check they haven't over-specified credential paths
             incompatible_args = ['certificate', 'key', 'provisioning_profile']
             args_dict = vars(args)
-            for k, v in vars(args).iteritems():
+            for k, v in vars(args).items():
                 if k in incompatible_args and v is not None:
                     raise Exception("Incompatible arguments. Do not use any of " +
                                     ", ".join(['--' + s for s in incompatible_args]) + " "

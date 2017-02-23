@@ -6,16 +6,18 @@
 # offer what we need for cms, so we also need to shell out to the openssl
 # tool, and make sure it's the right version.
 
-from distutils import spawn
-from exceptions import (ImproperCredentials,
-                        MissingCredentials,
-                        OpenSslFailure)
 import logging
-from OpenSSL import crypto
 import os
 import os.path
-import subprocess
 import re
+import subprocess
+from distutils import spawn
+
+from OpenSSL import crypto
+
+from .utils import PY3
+from .exceptions import ImproperCredentials, MissingCredentials, OpenSslFailure
+
 
 OPENSSL = os.getenv('OPENSSL', spawn.find_executable('openssl'))
 # modern OpenSSL versions look like '0.9.8zd'. Use a regex to parse
@@ -40,9 +42,8 @@ def openssl_command(args, data=None, expect_err=False):
     if data is not None:
         proc.stdin.write(data)
     out, err = proc.communicate()
-
     if not expect_err:
-        if err is not None and err != '':
+        if err is not None and err != b'':
             log.error("Command `{0}` returned error:\n{1}".format(cmd_str, err))
 
     if proc.returncode != 0:
@@ -52,6 +53,8 @@ def openssl_command(args, data=None, expect_err=False):
     if expect_err:
         return (out, err)
     else:
+        if not isinstance(out, str):
+            out = out.decode('utf-8')
         return out
 
 
@@ -136,7 +139,11 @@ class Signer(object):
         with open(self.signer_cert_file, 'rb') as fh:
             cert = crypto.load_certificate(crypto.FILETYPE_PEM, fh.read())
         subject = cert.get_subject()
-        return dict(subject.get_components())['CN']
+        if PY3:
+            name = b'CN'
+        else:
+            name = 'CN'
+        return dict(subject.get_components())[name]
 
     def _log_parsed_asn1(self, data):
         cmd = ['asn1parse', '-inform', 'DER' '-i']
