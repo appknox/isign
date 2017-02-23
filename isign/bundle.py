@@ -17,7 +17,8 @@ import glob
 import logging
 import os
 from os.path import basename, exists, join, splitext
-from . import signable
+from signer import openssl_command
+import signable
 import shutil
 
 log = logging.getLogger(__name__)
@@ -197,23 +198,42 @@ class App(Bundle):
     def provision(self, provision_path):
         shutil.copyfile(provision_path, self.provision_path)
 
-    def create_entitlements(self, team_id):
-        bundle_id = self.info['CFBundleIdentifier']
-        if isinstance(team_id, bytes):
-            team_id = team_id.decode()
-        if isinstance(bundle_id, bytes):
-            bundle_id = s.decode()
-        entitlements = {
-            "keychain-access-groups": [team_id + '.' + bundle_id],
-            "com.apple.developer.team-identifier": team_id,
-            "application-identifier": team_id + '.' + bundle_id,
-            "get-task-allow": True
-        }
-        plistlib.writePlist(entitlements, self.entitlements_path)
-        # log.debug("wrote Entitlements to {0}".format(self.entitlements_path))
+    @staticmethod
+    def extract_entitlements(provision_path):
+        """ Given a path to a provisioning profile, return the entitlements
+            encoded therein """
+        cmd = [
+            'smime',
+            '-inform', 'der',
+            '-verify',    # verifies content, prints verification status to STDERR,
+                          #  outputs content to STDOUT. In our case, will be an XML plist
+            '-noverify',  # accept self-signed certs. Not the opposite of -verify!
+            '-in', provision_path
+        ]
+        # this command always prints 'Verification successful' to stderr.
+        (profile_text, err) = openssl_command(cmd, data=None, expect_err=True)
+        if err and err.strip() != 'Verification successful':
+            log.error('Received unexpected error from openssl: {}'.format(err))
+        plist_dict = biplist.readPlistFromString(profile_text)
+        if 'Entitlements' not in plist_dict:
+            log.debug('failed to get entitlements in provisioning profile')
+            raise Exception('could not find Entitlements in {}'.format(provision_path))
+        return plist_dict['Entitlements']
+
+    def write_entitlements(self, signer, provisioning_path):
+        """ Given a path to a provisioning profile, write its entitlements to
+            self.entitlements_path """
+        entitlements = self.extract_entitlements(provisioning_path)
+        biplist.writePlist(entitlements, self.entitlements_path, binary=False)
+        log.debug("wrote Entitlements to {0}".format(self.entitlements_path))
 
     def resign(self, signer, provisioning_profile):
         """ signs app in place """
+        # copy the provisioning profile in
         self.provision(provisioning_profile)
-        self.create_entitlements(signer.team_id)
+
+        # Add entitlements from the pprof into the app
+        self.write_entitlements(signer, provisioning_profile)
+
+        # actually resign this bundle now
         super(App, self).resign(signer)

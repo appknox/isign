@@ -7,6 +7,9 @@
 # tool, and make sure it's the right version.
 
 from distutils import spawn
+from exceptions import (ImproperCredentials,
+                        MissingCredentials,
+                        OpenSslFailure)
 import logging
 from OpenSSL import crypto
 import os
@@ -23,9 +26,11 @@ MINIMUM_OPENSSL_VERSION = '1.0.1'
 log = logging.getLogger(__name__)
 
 
-def openssl_command(args, data=None):
-    """ given array of args, and optionally data to write,
-        return results of openssl command """
+def openssl_command(args, data=None, expect_err=False):
+    """ Given array of args, and optionally data to write,
+        return results of openssl command.
+        Some commands always write something to stderr, so allow
+        for that with the expect_err param. """
     cmd = [OPENSSL] + args
     cmd_str = ' '.join(cmd)
     # log.debug('running command ' + cmd_str)
@@ -36,13 +41,19 @@ def openssl_command(args, data=None):
     if data is not None:
         proc.stdin.write(data)
     out, err = proc.communicate()
-    # out, err = out.decode(), err.decode()
-    if err is not None and err != b'':
-        log.error("Command `{0}` returned error:\n{1}".format(cmd_str, err))
+
+    if not expect_err:
+        if err is not None and err != '':
+            log.error("Command `{0}` returned error:\n{1}".format(cmd_str, err))
+
     if proc.returncode != 0:
         msg = "openssl command `{0}` failed, see log for error".format(cmd_str)
-        raise Exception(msg)
-    return out
+        raise OpenSslFailure(msg)
+
+    if expect_err:
+        return (out, err)
+    else:
+        return out
 
 
 def get_installed_openssl_version():
@@ -85,14 +96,14 @@ class Signer(object):
             if not os.path.exists(filename):
                 msg = "Can't find {0}".format(filename)
                 log.warn(msg)
-                raise Exception(msg)
+                raise MissingCredentials(msg)
         self.signer_key_file = signer_key_file
         self.signer_cert_file = signer_cert_file
         self.apple_cert_file = apple_cert_file
         team_id = self._get_team_id()
         if team_id is None:
-            raise Exception("Cert file does not contain Subject line"
-                            "with Apple Organizational Unit (OU)")
+            raise ImproperCredentials("Cert file does not contain Subject line"
+                                      "with Apple Organizational Unit (OU)")
         self.team_id = team_id
         self.check_openssl_version()
 
@@ -119,8 +130,8 @@ class Signer(object):
         if len(signature) < 128:
             too_small_msg = "Command `{0}` returned success, but signature "
             "seems too small ({1} bytes)"
-            raise Exception(too_small_msg.format(' '.join(cmd),
-                                                 len(signature)))
+            raise OpenSslFailure(too_small_msg.format(' '.join(cmd),
+                                                      len(signature)))
         return signature
 
     def get_common_name(self):

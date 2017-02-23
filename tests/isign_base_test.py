@@ -18,6 +18,7 @@ class IsignBaseTest(unittest.TestCase):
     TEST_APPZIP = TEST_APP + '.zip'
     TEST_IPA = join(TEST_DIR, 'Test.ipa')
     TEST_WITH_FRAMEWORKS_IPA = join(TEST_DIR, 'TestWithFrameworks.ipa')
+    TEST_NONAPP_DIR = join(TEST_DIR, 'NotAnAppDir')
     TEST_NONAPP_TXT = join(TEST_DIR, 'NotAnApp.txt')
     TEST_NONAPP_IPA = join(TEST_DIR, 'NotAnApp.ipa')
     TEST_SIMULATOR_APP = join(TEST_DIR, 'TestSimulator.app.zip')
@@ -25,6 +26,8 @@ class IsignBaseTest(unittest.TestCase):
     CERTIFICATE = join(TEST_DIR, 'credentials', 'test.cert.pem')
     PROVISIONING_PROFILE = join(TEST_DIR, 'credentials', 'test.mobileprovision')
     ERROR_KEY = '_errors'
+    CREDENTIALS_DIR = join(TEST_DIR, 'credentials_std_names')
+    CREDENTIALS_DIR_2 = join(TEST_DIR, 'credentials_std_names_2')
     # Fake Apple organizational unit
     OU = 'ISIGNTESTS'
 
