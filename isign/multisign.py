@@ -1,9 +1,10 @@
-from os.path import isdir
-import isign
-from archive import archive_factory
-from signer import Signer
 import logging
 import multiprocessing
+from os.path import isdir
+
+import isign
+from isign.archive import archive_factory
+from isign.signer import Signer
 
 log = logging.getLogger(__name__)
 
@@ -119,7 +120,7 @@ def multisign_archive(archive, cred_dirs_to_output_paths, info_props=None):
         # and make archives in the desired paths.
         results = p.map(resign, resign_args)
 
-    except isign.NotSignable as e:
+    except isign.exceptions.NotSignable as e:
         msg = "Not signable: <{0}>: {1}\n".format(archive.path, e)
         log.error(msg)
         raise

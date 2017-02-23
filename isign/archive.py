@@ -3,23 +3,23 @@
     common interface to extract these apps to a temp file, then resign them,
     and create an archive of the same type """
 
-from .bundle import App, Bundle, is_info_plist_native
-from .exceptions import NotSignable, NotMatched
 import abc
-import biplist
-from bundle import App, Bundle, is_info_plist_native
-from exceptions import MissingHelpers, NotSignable, NotMatched
-from distutils import spawn
 import logging
 import os
-from os.path import abspath, dirname, exists, isdir, isfile, join, normpath
-import tempfile
-import re
-from subprocess import call
-from .signer import Signer
-import shutil
-import zipfile
 import plistlib
+import re
+import shutil
+import tempfile
+import zipfile
+from distutils import spawn
+from os.path import abspath, dirname, exists, isdir, isfile, join, normpath
+from subprocess import call
+
+import biplist
+
+from isign.bundle import App, Bundle, is_info_plist_native
+from isign.exceptions import MissingHelpers, NotMatched, NotSignable
+from isign.signer import Signer
 
 
 REMOVE_WATCHKIT = True
@@ -230,7 +230,7 @@ class AppZipArchive(Archive):
         if (cls.is_archive_extension_match(path) and
                 zipfile.is_zipfile(path)):
             log.debug("this is an archive, and a zipfile")
-            z = zipfile.ZipFile(cls.path)
+            z = zipfile.ZipFile(path)
             apps = set()
             file_list = z.namelist()
             for file_name in file_list:

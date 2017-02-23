@@ -10,7 +10,7 @@
 import construct
 import hashlib
 import math
-from . import macho
+from isign import macho
 from . import macho_cs
 
 
@@ -223,4 +223,3 @@ def make_signature(arch_macho, arch_end, cmds, f, entitlements_file):
     arch_macho.ncmds += 1
     arch_macho.sizeofcmds += len(macho.LoadCommand.build(cmd))
     cmds['LC_CODE_SIGNATURE'] = cmd
-

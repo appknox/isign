@@ -17,9 +17,11 @@ import glob
 import logging
 import os
 from os.path import basename, exists, join, splitext
-from signer import openssl_command
-import signable
 import shutil
+
+from .signer import openssl_command
+from . import signable
+
 
 log = logging.getLogger(__name__)
 

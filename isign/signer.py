@@ -7,16 +7,17 @@
 # tool, and make sure it's the right version.
 
 from distutils import spawn
-from exceptions import (ImproperCredentials,
-                        MissingCredentials,
-                        OpenSslFailure)
 import logging
 from OpenSSL import crypto
 import os
 import os.path
 import subprocess
 import re
+
 from isign.utils import decode_dict
+from .exceptions import (ImproperCredentials,
+                        MissingCredentials,
+                        OpenSslFailure)
 
 OPENSSL = os.getenv('OPENSSL', spawn.find_executable('openssl'))
 # modern OpenSSL versions look like '0.9.8zd'. Use a regex to parse

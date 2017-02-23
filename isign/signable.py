@@ -13,7 +13,7 @@ from .codesig import (Codesig,
                      ApplicationSlot,
                      InfoSlot)
 import logging
-import macho
+from isign import macho
 # from makesig import make_signature
 import os
 import tempfile
