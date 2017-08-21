@@ -1,8 +1,11 @@
-from . import archive
-# import makesig
-from . import exceptions
+"""
+foo
+"""
 import os
 from os.path import dirname, join, realpath
+
+from . import archive
+from . import exceptions
 
 # this comes with the repo
 PACKAGE_ROOT = dirname(realpath(__file__))
@@ -18,7 +21,7 @@ try:
     KEY_PATH = join(DEFAULT_CREDENTIALS_PATH, 'mobdev.key.pem')
     PROVISIONING_PROFILE_PATH = join(DEFAULT_CREDENTIALS_PATH,
                                      'mobdev1.mobileprovision')
-except Exception as e:
+except Exception:
     DEFAULT_CREDENTIALS_PATH = join(os.environ['HOME'], '.isign')
     CERTIFICATE_PATH = join(DEFAULT_CREDENTIALS_PATH, 'certificate.pem')
     KEY_PATH = join(DEFAULT_CREDENTIALS_PATH, 'key.pem')
@@ -47,14 +50,14 @@ def resign(input_path,
                               provisioning_profile,
                               output_path,
                               info_props)
-    except exceptions.NotSignable as e:
+    except exceptions.NotSignable:
         # re-raise the exception without exposing internal
         # details of how it happened
-        raise NotSignable(e)
+        raise NotSignable("Not Signable")
 
 
 def view(input_path):
     try:
         return archive.view(input_path)
-    except exceptions.NotSignable as e:
-        raise NotSignable(e)
+    except exceptions.NotSignable:
+        raise NotSignable('Not Signable')
