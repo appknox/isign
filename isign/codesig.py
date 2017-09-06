@@ -115,9 +115,11 @@ class Codesig(object):
         # this is for convenience, a reference to the first blob
         # structure within requirements, which contains the data
         # we are going to change
-        req_blob_0 = requirements.data.BlobIndex[0].blob
-        req_blob_0_original_length = req_blob_0.length
-
+        try:
+            req_blob_0 = requirements.data.BlobIndex[0].blob
+            req_blob_0_original_length = req_blob_0.length
+        except IndexError:
+            log.debug("Cannot sign, probably a self-signed app")
         if self.signable.get_changed_bundle_id():
             # Set the bundle id if it changed
             try:
