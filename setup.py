@@ -1,37 +1,24 @@
-# encoding: utf-8
+'''
+Some Py file
+'''
+
+from os import path
+
 from setuptools import setup, find_packages
-from codecs import open  # to use a consistent encoding
-from subprocess import check_output
-from os import path, environ
 
-here = path.abspath(path.dirname(__file__))
+HERE = path.abspath(path.dirname(__file__))
 
-if path.exists(path.join(here, "version.sh")):  # development
-    if 'PYTHON_PACKAGE_VERSION' in environ:
-        version = environ['PYTHON_PACKAGE_VERSION']
-    else:
-        version = check_output(path.join(here, "version.sh")).decode().strip()
-    package_name = path.basename(here)
-else:  # source package
-    with open(path.join(here, "PKG-INFO")) as f:
-        for line in f.readlines():
-            if line.startswith("Version:"):
-                version = line.split(":")[1].strip()
-            elif line.startswith("Name:"):
-                package_name = line.split(":")[1].strip()
-
-package_name = "ak-isign"
-version = "0.9.3"
-package = package_name.replace('-', '_')
+__version__ = "0.9.3"
+PACKAGE_NAME = "ak_isign"
 
 
 setup(
-    name=package_name,
-    version=version,
+    name=PACKAGE_NAME,
+    version=__version__,
     description='Re-signing iOS apps without Apple tools',
-    url='https://github.com/saucelabs/{}'.format(package_name),
+    url='https://github.com/saucelabs/{}'.format(PACKAGE_NAME),
     download_url='https://github.com/saucelabs/{}/tarball/v{}'.format(
-        package_name, version),
+        PACKAGE_NAME, __version__),
     author='Sauce Labs',
     author_email='dev@saucelabs.com',
     classifiers=[
