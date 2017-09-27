@@ -174,6 +174,16 @@ See Apple documentation for `valid Info.plist keys <https://developer.apple.com/
 
 Path to your private key in PEM format. Defaults to ``$HOME/.isign/key.pem``.
 
+**-n <directory>, --credentials <directory>**
+
+Equivalent to:
+
+.. code::
+
+   -k <directory>/key.pem 
+   -c <directory>/certificate.pem 
+   -p <directory>/isign.mobileprovision
+
 **-o <path>, --output <path>**
 
 Path to write the re-signed application. Defaults to ``out`` in your current working directory.
@@ -198,6 +208,9 @@ resigning, ``isign`` will always create an archive of the same type as the origi
 
 Contributing
 ------------
+
+Sauce Labs open source projects have a `Code of Conduct <CONDUCT.md>`__. In short, we try to respect each other, 
+listen, and be helpful.
 
 Development happens on `our Github repository <https://github.com/saucelabs/isign>`__. File an issue, or fork the code!
 
@@ -226,9 +239,6 @@ Sauce Labs supports ongoing public ``isign`` development. ``isign`` is a part of
 for the `iOS Real Device Cloud <https://saucelabs.com/press-room/press-releases/sauce-labs-expands-mobile-test-automation-cloud-with-the-addition-of-real-devices-1>`__,
 which allows customers to test apps and websites on real iOS devices. ``isign`` has been successfully re-signing submitted customer apps in production
 since June 2015.
-
-This project not have an official code of conduct, yet, but one is forthcoming. Please contribute
-to discussion `here <https://github.com/saucelabs/isign/issues/6>`__.
 
 .. _More documentation:
 

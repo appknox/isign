@@ -7,6 +7,9 @@
 # tool, and make sure it's the right version.
 
 from distutils import spawn
+from .exceptions import (ImproperCredentials,
+                        MissingCredentials,
+                        OpenSslFailure)
 import logging
 from OpenSSL import crypto
 import os
@@ -15,7 +18,7 @@ import subprocess
 import re
 from isign.utils import decode_dict
 
-OPENSSL = os.getenv('OPENSSL', spawn.find_executable('openssl'))
+OPENSSL = os.getenv('OPENSSL', spawn.find_executable('openssl', os.getenv('PATH', '')))
 # modern OpenSSL versions look like '0.9.8zd'. Use a regex to parse
 OPENSSL_VERSION_RE = re.compile(b'(\d+).(\d+).(\d+)(\w*)')
 MINIMUM_OPENSSL_VERSION = '1.0.1'
@@ -23,9 +26,11 @@ MINIMUM_OPENSSL_VERSION = '1.0.1'
 log = logging.getLogger(__name__)
 
 
-def openssl_command(args, data=None):
-    """ given array of args, and optionally data to write,
-        return results of openssl command """
+def openssl_command(args, data=None, expect_err=False):
+    """ Given array of args, and optionally data to write,
+        return results of openssl command.
+        Some commands always write something to stderr, so allow
+        for that with the expect_err param. """
     cmd = [OPENSSL] + args
     cmd_str = ' '.join(cmd)
     # log.debug('running command ' + cmd_str)
@@ -37,12 +42,20 @@ def openssl_command(args, data=None):
         proc.stdin.write(data)
     out, err = proc.communicate()
     # out, err = out.decode(), err.decode()
-    if err is not None and err != b'':
-        log.error("Command `{0}` returned error:\n{1}".format(cmd_str, err))
+    err = err.decode()
+
+    if not expect_err:
+        if err is not None and err != '':
+            log.error("Command `{0}` returned error:\n{1}".format(cmd_str, err))
+
     if proc.returncode != 0:
         msg = "openssl command `{0}` failed, see log for error".format(cmd_str)
-        raise Exception(msg)
-    return out
+        raise OpenSslFailure(msg)
+
+    if expect_err:
+        return (out, err)
+    else:
+        return out
 
 
 def get_installed_openssl_version():
@@ -85,15 +98,15 @@ class Signer(object):
             if not os.path.exists(filename):
                 msg = "Can't find {0}".format(filename)
                 log.warn(msg)
-                raise Exception(msg)
+                raise MissingCredentials(msg)
         self.signer_key_file = signer_key_file
         self.signer_cert_file = signer_cert_file
         self.apple_cert_file = apple_cert_file
+        self.team_id = None
         team_id = self._get_team_id()
         if team_id is None:
-            raise Exception("Cert file does not contain Subject line"
-                            "with Apple Organizational Unit (OU)")
-        self.team_id = team_id
+            raise ImproperCredentials("Cert file does not contain Subject line"
+                                      "with Apple Organizational Unit (OU)")
         self.check_openssl_version()
 
     def check_openssl_version(self):
@@ -114,13 +127,14 @@ class Signer(object):
             "-outform", "DER"
         ]
         signature = openssl_command(cmd, data)
+        log.debug("in length: {}, out length: {}".format(len(data), len(signature)))
         # in some cases we've seen this return a zero length file.
         # Misconfigured machines?
         if len(signature) < 128:
             too_small_msg = "Command `{0}` returned success, but signature "
             "seems too small ({1} bytes)"
-            raise Exception(too_small_msg.format(' '.join(cmd),
-                                                 len(signature)))
+            raise OpenSslFailure(too_small_msg.format(' '.join(cmd),
+                                                      len(signature)))
         return signature
 
     def get_common_name(self):
@@ -138,6 +152,9 @@ class Signer(object):
 
     def _get_team_id(self):
         """ Same as Apple Organizational Unit. Should be in the cert """
+        if self.team_id:
+            return self.team_id
+
         team_id = None
         cmd = [
             'x509',
@@ -152,4 +169,22 @@ class Signer(object):
             if match is not None:
                 team_id = match.group(1)
                 break
+        self.team_id = team_id
         return team_id
+
+    def is_adhoc(self):
+        return False
+
+class AdhocSigner(Signer):
+    def __init__(self):
+        pass
+
+    def sign(self, data):
+        """Return empty signature"""
+        return ''
+
+    def is_adhoc(self):
+        return True
+
+    def _get_team_id(self):
+        return ''

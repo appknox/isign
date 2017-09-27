@@ -32,9 +32,10 @@ setup(
     packages=find_packages(),
     install_requires=[
         # 'biplist==0.9',
-        'ak-construct==2.5.2',
+        'construct==2.8.14',
         'memoizer==0.0.1',
-        'pyOpenSSL==17.2.0'
+        'pyOpenSSL==17.2.0',
+        'biplist==1.0.2'
     ],
     package_data={
         'isign': ['apple_credentials/applecerts.pem',
@@ -42,6 +43,7 @@ setup(
                   'version.json'],
     },
     scripts=['bin/isign',
+             'bin/multisign',
              'bin/isign_export_creds.sh',
              'bin/isign_guess_mobileprovision.sh']
 )

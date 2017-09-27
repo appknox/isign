@@ -1,0 +1,108 @@
+#!/usr/bin/env python
+
+# From a single IPA, generate multiple re-signed IPAs simultaneously.
+# Why? Because you might want to distribute an app to a lot of organizations at once,
+# or perhaps you need to sign for an enterprise and a local debug deployment all at
+# the same time, and you want it to be fast.
+
+# Depends on the existence of external `zip` and `unzip` programs.
+
+import argparse
+from os.path import abspath, basename, dirname, expanduser, join
+from isign.multisign import multisign
+import logging
+
+FORMATTER = logging.Formatter('%(message)s')
+log = logging.getLogger(__name__)
+
+
+def log_to_stderr(level=logging.INFO):
+    root = logging.getLogger()
+    root.setLevel(level)
+    handler = logging.StreamHandler()
+    handler.setFormatter(FORMATTER)
+    root.addHandler(handler)
+
+
+def absolute_path_argument(path):
+    return abspath(expanduser(path))
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='From a single IPA, generate multiple re-signed IPAs simultaneously')
+    parser.add_argument(
+        '-a', '--app',
+        dest='app',
+        required=True,
+        metavar='<file>',
+        type=absolute_path_argument,
+        help='Path to input app'
+    )
+    parser.add_argument(
+        'credential_dirs',
+        nargs='+',
+        metavar='<directory>',
+        type=absolute_path_argument,
+        help='Paths to directories containing credentials with standardized names'
+    )
+    parser.add_argument(
+        '-i', '--info',
+        dest='info_props',
+        required=False,
+        metavar='<Info.plist properties>',
+        help='List of comma-delimited key=value pairs of Info.plist properties to override'
+    )
+    parser.add_argument(
+        '-v', '--verbose',
+        dest='verbose',
+        action='store_true',
+        default=False,
+        required=False,
+        help='Set logging level to debug.'
+    )
+    return parser.parse_args()
+
+def get_output_path(original_path, credential_dir):
+    """ Create some filename based on the credential directory and original path """
+    original_name = basename(original_path)
+    original_dir = dirname(original_path)
+    resigned_name = basename(credential_dir) + '_' + original_name
+    return join(original_dir, resigned_name)
+
+
+if __name__ == '__main__':
+    args = parse_args()
+
+    if args.verbose:
+        level = logging.DEBUG
+    else:
+        level = logging.INFO
+    log_to_stderr(level)
+
+    # Convert the Info.plist property pairs to a dict format
+    info_props = None
+    if args.info_props:
+        info_props = {}
+        for arg in args.info_props.split(','):
+            i = arg.find('=')
+            if i < 0:
+                raise Exception('Invalid Info.plist argument: ' + arg)
+            info_props[arg[0:i]] = arg[i + 1:]
+
+    log.debug('got credential paths: {}'.format(', '.join(args.credential_dirs)))
+    log.debug('got incoming app: {}'.format(args.app))
+
+    # ensure basenames are unique
+    unique_basenames = set([basename(p) for p in args.credential_dirs])
+    if len(args.credential_dirs) != len(unique_basenames):
+        raise Exception('Credential directories do not have unique basenames. '
+                        'Cannot name output archives automatically. Sorry!')
+
+    credential_dirs_to_output_paths = {}
+    for d in args.credential_dirs:
+        credential_dirs_to_output_paths[d] = get_output_path(args.app, d)
+
+    results = multisign(args.app, credential_dirs_to_output_paths, info_props)
+    for credentials_dir, resigned_app_path in results:
+        log.info("resigned with %s to %s", credentials_dir, resigned_app_path)
