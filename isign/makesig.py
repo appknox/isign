@@ -91,18 +91,23 @@ def make_requirements(drs, ident, signer):
                                                                 bytes=des_req_data))])
 
     if drs:
-        dr_exprs = [dr.blob.data.expr for dr in drs.data.BlobIndex]
-        expr = make_expr('Or', *dr_exprs)
-        lib_req = construct.Container(kind=1, expr=expr)
-        lib_req_data = macho_cs.Requirement.build(lib_req)
+        # dr_exprs = [dr.blob.data.expr for dr in drs.data.BlobIndex if dr.blob is not None]
+        dr_exprs = []
+        for dr in drs.data.BlobIndex:
+            if dr.blob is not None:
+                dr_exprs.append(dr.blob.data.expr)
+        if len(dr_exprs) > 0:
+            expr = make_expr('Or', *dr_exprs)
+            lib_req = construct.Container(kind=1, expr=expr)
+            lib_req_data = macho_cs.Requirement.build(lib_req)
 
-        reqs.BlobIndex.append(construct.Container(type='kSecLibraryRequirementType',
-                                                  offset=28 + len(des_req_data) + 8,
-                                                  blob=construct.Container(magic='CSMAGIC_REQUIREMENT',
-                                                                           length=len(lib_req_data) + 8,
-                                                                           data=lib_req,
-                                                                           bytes=lib_req_data)))
-        reqs.count += 1
+            reqs.BlobIndex.append(construct.Container(type='kSecLibraryRequirementType',
+                                                      offset=28 + len(des_req_data) + 8,
+                                                      blob=construct.Container(magic='CSMAGIC_REQUIREMENT',
+                                                                               length=len(lib_req_data) + 8,
+                                                                               data=lib_req,
+                                                                               bytes=lib_req_data)))
+            reqs.count += 1
 
     return reqs
 
