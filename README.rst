@@ -3,7 +3,7 @@ isign
 
 A tool and library to re-sign iOS applications, without proprietary Apple software.
 
-For example, an iOS app in development would probably only run on the developer's iPhone. 
+For example, an iOS app in development would probably only run on the developer's iPhone.
 ``isign`` can alter the app so that it can run on another developer's iPhone.
 
 Apple tools already exist to do this. But with ``isign``, now you can do this on operating
@@ -40,7 +40,7 @@ Mac OS X
 ~~~~~~~~
 
 On Mac OS X, there are a lot of prerequisites, so the ``pip`` method probably won't work.
-The easiest method is to use ``git`` to clone the `source code repository <https://github.com/saucelabs/isign>`__ and 
+The easiest method is to use ``git`` to clone the `source code repository <https://github.com/saucelabs/isign>`__ and
 run the install script:
 
 .. code::
@@ -54,21 +54,21 @@ run the install script:
 How to get started
 ------------------
 
-All the libraries and tools that ``isign`` needs to run will work on both Linux 
-and Mac OS X. However, you will need a Mac to export your Apple developer 
-credentials. 
+All the libraries and tools that ``isign`` needs to run will work on both Linux
+and Mac OS X. However, you will need a Mac to export your Apple developer
+credentials.
 
-If you're like most iOS developers, credentials are confusing -- if so check out 
+If you're like most iOS developers, credentials are confusing -- if so check out
 the `documentation on credentials <https://github.com/saucelabs/isign/blob/master/docs/credentials.rst>`__ on Github.
 
-You should have a key and certificate in 
+You should have a key and certificate in
 `Keychain Access <https://en.wikipedia.org/wiki/Keychain_(software)>`__,
-and a provisioning profile associated with that certificate, that you 
+and a provisioning profile associated with that certificate, that you
 can use to sign iOS apps for one or more of your own iOS devices.
 
-In Keychain Access, open the *Certificates*. Find the certificate you use to sign apps. 
-Right click on it and export the key as a ``.p12`` file, let's say ``Certificates.p12``. If Keychain 
-asks you for a password to protect this file, just leave it blank. 
+In Keychain Access, open the *Certificates*. Find the certificate you use to sign apps.
+Right click on it and export the key as a ``.p12`` file, let's say ``Certificates.p12``. If Keychain
+asks you for a password to protect this file, just leave it blank.
 
 Next, let's extract the key and certificate you need, into a standard PEM format.
 
@@ -82,12 +82,12 @@ By default, ``isign_export_creds.sh`` will put these files into ``~/.isign``, wh
 the standard place to put ``isign`` configuration files.
 
 Finally, you need a provisioning profile from the Apple Developer Portal that uses
-the same certificate. If you've never dealt with this, the provisioning profile is 
+the same certificate. If you've never dealt with this, the provisioning profile is
 what tells the phone that you Apple has okayed you installing apps onto this particular phone.
 
-If you develop with XCode, you might have a provisioning profile already. 
-On the Mac where you develop with XCode, try running the ``isign_guess_mobileprovision.sh`` script. 
-If you typically have only a few provisioning profiles and install on one phone, it might find it. 
+If you develop with XCode, you might have a provisioning profile already.
+On the Mac where you develop with XCode, try running the ``isign_guess_mobileprovision.sh`` script.
+If you typically have only a few provisioning profiles and install on one phone, it might find it.
 
 Anyway, once you have a ``.mobileprovision`` file, move it to ``~/.isign/isign.mobileprovision``.
 
@@ -165,8 +165,8 @@ Show a help message and exit.
 
 **-i, --info**
 
-While resigning, add or update info in the application's information property list (Info.plist). 
-Takes a comma-separated list of key=value pairs, such as 
+While resigning, add or update info in the application's information property list (Info.plist).
+Takes a comma-separated list of key=value pairs, such as
 ``CFBundleIdentifier=com.example.app,CFBundleName=ExampleApp``. Use with caution!
 See Apple documentation for `valid Info.plist keys <https://developer.apple.com/library/ios/documentation/General/Reference/InfoPlistKeyReference/Introduction/Introduction.html>`_.
 
@@ -180,8 +180,8 @@ Equivalent to:
 
 .. code::
 
-   -k <directory>/key.pem 
-   -c <directory>/certificate.pem 
+   -k <directory>/key.pem
+   -c <directory>/certificate.pem
    -p <directory>/isign.mobileprovision
 
 **-o <path>, --output <path>**
@@ -190,7 +190,7 @@ Path to write the re-signed application. Defaults to ``out`` in your current wor
 
 **-p <path>, --provisioning-profile <path>**
 
-Path to your provisioning profile. This should be associated with your certificate. Defaults to 
+Path to your provisioning profile. This should be associated with your certificate. Defaults to
 ``$HOME/.isign/isign.mobileprovision``.
 
 **-v, --verbose**
@@ -199,7 +199,7 @@ More verbose logs will be printed to STDERR.
 
 **Application path**
 
-The app to be resigned is specified on the command line after other arguments. The application path is 
+The app to be resigned is specified on the command line after other arguments. The application path is
 typically an IPA, but can also be a ``.app`` directory or even a zipped ``.app`` directory. When
 resigning, ``isign`` will always create an archive of the same type as the original.
 
@@ -209,12 +209,12 @@ resigning, ``isign`` will always create an archive of the same type as the origi
 Contributing
 ------------
 
-Sauce Labs open source projects have a `Code of Conduct <CONDUCT.md>`__. In short, we try to respect each other, 
+Sauce Labs open source projects have a `Code of Conduct <CONDUCT.md>`__. In short, we try to respect each other,
 listen, and be helpful.
 
 Development happens on `our Github repository <https://github.com/saucelabs/isign>`__. File an issue, or fork the code!
 
-You'll probably want to create some kind of python virtualenv, so you don't have to touch your system python or its 
+You'll probably want to create some kind of python virtualenv, so you don't have to touch your system python or its
 libraries. `virtualenvwrapper <https://virtualenvwrapper.readthedocs.org/en/latest/>`__ is a good tool for this.
 
 Then, just do the following:
@@ -223,7 +223,7 @@ Then, just do the following:
 
   $ git clone https://github.com/saucelabs/isign.git
   $ cd isign
-  $ dev/setup.sh 
+  $ dev/setup.sh
   $ ./run_tests.sh
 
 If the tests don't pass please `file an issue <https://github.com/saucelabs/isign/issues>`__. Please keep the tests up to date as you develop.
@@ -258,3 +258,7 @@ Authors
 Proof of concept by `Steven Hazel <https://github.com/sah>`__ and Neil Kandalgaonkar.
 
 Reference scripts using Apple tools by `Michael Han <https://github.com/mhan>`__.
+
+Ported to python3 by `Subho Halder <https://github.com/subho007>`__ and `dhilipsiva <https://github.com/dhilipsiva>`__
+
+Supported by Appknox - `https://www.appknox.com <https://www.appknox.com>`__
