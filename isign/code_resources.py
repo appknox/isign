@@ -142,8 +142,15 @@ class ResourceBuilder(object):
                 if self.app_path == path:
                     continue
 
-                # the Data element in plists is base64-encoded
-                val = {'hash': plistlib.Data(get_hash_binary(path))}
+                # in the case of symlinks, we don't calculate the hash but rather add a key for it being a symlink
+                if os.path.islink(path):
+                    # omit symlinks from files, leave in files2
+                    if not self.respect_omissions:
+                        continue
+                    val = {'symlink': os.readlink(path)}
+                else:
+                    # the Data element in plists is base64-encoded
+                    val = {'hash': plistlib.Data(get_hash_binary(path))}
 
                 if rule.is_optional():
                     val['optional'] = True
