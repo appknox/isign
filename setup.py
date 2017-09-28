@@ -32,7 +32,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         # 'biplist==0.9',
-        'construct==2.8.14',
+        'ak-construct==2.5.2',
         'memoizer==0.0.1',
         'pyOpenSSL==17.2.0',
         'biplist==1.0.2'
