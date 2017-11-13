@@ -58,7 +58,7 @@ class PathRule(object):
                 # if it was true, this file is required;
                 # do nothing
             elif isinstance(properties, dict):
-                for key, value in properties.items():
+                for key, value in list(properties.items()):
                     if key == 'optional' and value is True:
                         self.flags |= PathRule.OPTIONAL
                     elif key == 'omit' and value is True:
@@ -99,7 +99,7 @@ class ResourceBuilder(object):
         self.rules = []
         self.respect_omissions = respect_omissions
         self.include_sha256 = include_sha256
-        for pattern, properties in rules_data.items():
+        for pattern, properties in list(rules_data.items()):
             self.rules.append(PathRule(pattern, properties))
 
     def find_rule(self, path):

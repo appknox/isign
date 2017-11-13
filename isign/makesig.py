@@ -203,10 +203,10 @@ def make_basic_codesig(entitlements_file, drs, code_limit, hashes, signer, ident
                                                                     data="",
                                                                     bytes="",
                                                                     ))
-    indicies = filter(None, [cd_index,
+    indicies = [_f for _f in [cd_index,
                 requirements_index,
                 entitlements_index,
-                sigwrapper_index])
+                sigwrapper_index] if _f]
 
     superblob = construct.Container(
         sb_start=0,
@@ -309,7 +309,7 @@ def make_signature(arch_macho, arch_offset, arch_size, cmds, f, entitlements_fil
             file_slice += ("\x00" * (bytes_to_read - len(file_slice)))
         actual_data += file_slice
 
-        for i in xrange(nCodeSlots):
+        for i in range(nCodeSlots):
             actual_data_slice = actual_data[(0x1000 * i):(0x1000 * i + 0x1000)]
 
             actual = hashlib.sha1(actual_data_slice).digest()

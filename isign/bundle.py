@@ -56,7 +56,7 @@ class Bundle(object):
         self.orig_info = None
         if not is_info_plist_native(self.info):
             # while we should probably not allow this *or* add it ourselves, it appears to work without it
-            log.debug(u"Missing/invalid CFBundleSupportedPlatforms value in {}".format(self.info_path))
+            log.debug("Missing/invalid CFBundleSupportedPlatforms value in {}".format(self.info_path))
         # will be added later
         self.seal_path = None
 
@@ -97,7 +97,7 @@ class Bundle(object):
                     url_type['CFBundleURLName'] = new_bundle_id
                     changed = True
 
-        for key, val in new_props.items():
+        for key, val in list(new_props.items()):
             is_new_key = key not in self.info
             if is_new_key or self.info[key] != val:
                 if is_new_key:

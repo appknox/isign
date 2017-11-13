@@ -25,7 +25,7 @@ def get_credential_paths(directory, file_names=DEFAULT_CREDENTIAL_FILE_NAMES):
     """ Given a directory, return dict of paths to standard
         credential files """
     paths = {}
-    for (k, file_name) in file_names.items():
+    for (k, file_name) in list(file_names.items()):
         paths[k] = join(directory, file_name)
     return paths
 

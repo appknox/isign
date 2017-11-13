@@ -29,7 +29,7 @@ def decode_dict(source):
             decode_list.append(decode_dict(item))
         return decode_list
     target = {}
-    for key, value in source.items():
+    for key, value in list(source.items()):
         key = decode_dict(key)
         value = decode_dict(value)
         target[key] = value

@@ -82,11 +82,7 @@ def process_watchkit(root_bundle_path, should_remove=False):
             raise NotSignable("Cannot yet sign WatchKit bundles")
 
 
-class Archive(object):
-    __metaclass__ = abc.ABCMeta
-    # we use abc.abstractmethod throughout because there are certain class
-    # methods we want to ensure are implemented.
-
+class Archive(object, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def unarchive_to_temp(self):
         """ Unarchive and copy to a temp directory """
