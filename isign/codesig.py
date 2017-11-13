@@ -140,6 +140,9 @@ class Codesig(object):
 
         signer_cn = signer.get_common_name()
 
+        if len(requirements.data.BlobIndex) < 1:
+            return
+
         # this is for convenience, a reference to the first blob
         # structure within requirements, which contains the data
         # we are going to change
