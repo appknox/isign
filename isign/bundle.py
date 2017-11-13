@@ -55,7 +55,8 @@ class Bundle(object):
         self.info = plistlib.readPlist(self.info_path)
         self.orig_info = None
         if not is_info_plist_native(self.info):
-            raise NotMatched("not a native iOS bundle")
+            # while we should probably not allow this *or* add it ourselves, it appears to work without it
+            log.debug(u"Missing/invalid CFBundleSupportedPlatforms value in {}".format(self.info_path))
         # will be added later
         self.seal_path = None
 

@@ -91,12 +91,12 @@ def make_requirements(drs, ident, signer):
                                                                 bytes=des_req_data))])
 
     if drs:
-        # dr_exprs = [dr.blob.data.expr for dr in drs.data.BlobIndex if dr.blob is not None]
         dr_exprs = []
         for dr in drs.data.BlobIndex:
             if dr.blob is not None:
                 dr_exprs.append(dr.blob.data.expr)
-        if len(dr_exprs) > 0:
+        # make_expr expects at least 2 arguments, need to verify that we pass those in, otherwise just return
+        if len(dr_exprs) > 1:
             expr = make_expr('Or', *dr_exprs)
             lib_req = construct.Container(kind=1, expr=expr)
             lib_req_data = macho_cs.Requirement.build(lib_req)

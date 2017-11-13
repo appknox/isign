@@ -35,7 +35,7 @@ class EntitlementsSlot(CodeDirectorySlot):
 class ApplicationSlot(CodeDirectorySlot):
     offset = -4
 
-    def get_hash(self):
+    def get_hash(self, hash_algorithm):
         return '\x00' * 20
 
 
