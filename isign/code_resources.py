@@ -93,11 +93,12 @@ class PathRule(object):
 class ResourceBuilder(object):
     NULL_PATH_RULE = PathRule()
 
-    def __init__(self, app_path, rules_data, respect_omissions=False):
+    def __init__(self, app_path, rules_data, respect_omissions=False, include_sha256=False):
         self.app_path = app_path
         self.app_dir = os.path.dirname(app_path)
         self.rules = []
         self.respect_omissions = respect_omissions
+        self.include_sha256 = include_sha256
         for pattern, properties in rules_data.items():
             self.rules.append(PathRule(pattern, properties))
 
@@ -151,6 +152,8 @@ class ResourceBuilder(object):
                 else:
                     # the Data element in plists is base64-encoded
                     val = {'hash': plistlib.Data(get_hash_binary(path))}
+                    if self.include_sha256:
+                        val['hash2'] = plistlib.Data(get_hash_binary(path, 'sha256'))
 
                 if rule.is_optional():
                     val['optional'] = True
@@ -186,9 +189,15 @@ def get_template():
 
 
 @memoize
-def get_hash_hex(path):
+def get_hash_hex(path, hash_type='sha1'):
     """ Get the hash of a file at path, encoded as hexadecimal """
-    hasher = hashlib.sha1()
+    if hash_type == 'sha256':
+        hasher = hashlib.sha256()
+    elif hash_type == 'sha1':
+        hasher = hashlib.sha1()
+    else:
+        raise ValueError("Incorrect hash type provided: {}".format(hash_type))
+
     with open(path, 'rb') as afile:
         buf = afile.read(HASH_BLOCKSIZE)
         while len(buf) > 0:
@@ -198,9 +207,9 @@ def get_hash_hex(path):
 
 
 @memoize
-def get_hash_binary(path):
+def get_hash_binary(path, hash_type='sha1'):
     """ Get the hash of a file at path, encoded as binary """
-    return binascii.a2b_hex(get_hash_hex(path))
+    return binascii.a2b_hex(get_hash_hex(path, hash_type))
 
 
 def write_plist(target_dir, plist):
@@ -226,10 +235,11 @@ def make_seal(source_app_path, target_dir=None):
     # n.b. code_resources_template not only contains a template of
     # what the file should look like; it contains default rules
     # deciding which files should be part of the seal
-    rules = template['rules2']
+    rules = template['rules']
     plist = copy.deepcopy(template)
-    resource_builder = ResourceBuilder(source_app_path, rules)
+    resource_builder = ResourceBuilder(source_app_path, rules, respect_omissions=False)
     plist['files'] = resource_builder.scan()
-    resource_builder2 = ResourceBuilder(source_app_path, rules, True)
+    rules2 = template['rules2']
+    resource_builder2 = ResourceBuilder(source_app_path, rules2, respect_omissions=True, include_sha256=True)
     plist['files2'] = resource_builder2.scan()
     return write_plist(target_dir, plist)
