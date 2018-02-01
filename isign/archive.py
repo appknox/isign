@@ -250,10 +250,19 @@ class AppZipArchive(Archive):
 
     def unarchive_to_temp(self):
         containing_dir = make_temp_dir()
-        call([get_helper('unzip'), "-qu", self.path, "-d", containing_dir])
+        self.extract_to(self.path, containing_dir)
         app_dir = abspath(join(containing_dir, self.relative_bundle_dir))
         process_watchkit(app_dir, REMOVE_WATCHKIT)
         return UncompressedArchive(containing_dir, self.relative_bundle_dir, self.__class__)
+
+    def extract_to(self, src, dst='.'):
+        zip_ref = zipfile.ZipFile(src, 'r')
+        for fileinfo in zip_ref.infolist():
+            filename = fileinfo.filename.encode('cp437').decode()
+            final_path = os.path.join(dst, filename)
+            os.makedirs(os.path.dirname(final_path), exist_ok=True)
+            outputfile = open(final_path, "wb")
+            shutil.copyfileobj(zip_ref.open(fileinfo.filename), outputfile)
 
     @classmethod
     def archive(cls, containing_dir, output_path):
