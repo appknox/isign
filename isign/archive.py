@@ -261,6 +261,9 @@ class AppZipArchive(Archive):
             filename = fileinfo.filename.encode('cp437').decode()
             final_path = os.path.join(dst, filename)
             os.makedirs(os.path.dirname(final_path), exist_ok=True)
+            if fileinfo.is_dir():
+                os.makedirs(final_path, exist_ok=True)
+                continue
             outputfile = open(final_path, "wb")
             shutil.copyfileobj(zip_ref.open(fileinfo.filename), outputfile)
 
