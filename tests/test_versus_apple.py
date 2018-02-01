@@ -270,14 +270,9 @@ class TestVersusApple(IsignBaseTest):
         if platform.system() != 'Darwin' or CODESIGN_BIN is None:
             raise SkipTest
 
-<<<<<<< HEAD
-        # resign the test app that has frameworks,
-        # extract it to a temp directory
-=======
         old_cwd = os.getcwd()
 
         # resign the test app that has frameworks, extract it to a temp directory
->>>>>>> 495e3145335aba4bb9241aef5baa0baaae7794d8
         working_dir = tempfile.mkdtemp()
         resigned_ipa_path = join(working_dir, 'resigned.ipa')
         self.resign(self.TEST_WITH_FRAMEWORKS_IPA,
