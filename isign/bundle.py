@@ -264,3 +264,7 @@ class App(Bundle):
 
         # actually resign this bundle now
         super(App, self).resign(deep, signer)
+
+        # The entitlements are only needed temporarily while signing so we
+        # don't want to leave the file in the Payload/archive...
+        os.remove(self.entitlements_path);
