@@ -110,7 +110,7 @@ class ResourceBuilder(object):
                 if rule.flags and rule.is_exclusion():
                     best_rule = rule
                     break
-                elif rule.weight > best_rule.weight:
+                elif rule.weight >= best_rule.weight:
                     best_rule = rule
         return best_rule
 
