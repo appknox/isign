@@ -110,7 +110,7 @@ class ResourceBuilder(object):
                 if rule.flags and rule.is_exclusion():
                     best_rule = rule
                     break
-                elif rule.weight > best_rule.weight:
+                elif rule.weight >= best_rule.weight:
                     best_rule = rule
         return best_rule
 
@@ -133,6 +133,12 @@ class ResourceBuilder(object):
                 rule, path, relative_path = self.get_rule_and_paths(root,
                                                                     filename)
                 # log.debug(rule_debug_fmt.format(rule, path, relative_path))
+
+                # There's no rule for the Entitlements.plist file which we
+                # generate temporarily so we just ommit the file as a special
+                # case...
+                if relative_path == 'Entitlements.plist':
+                    continue
 
                 if rule.is_exclusion():
                     continue
