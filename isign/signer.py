@@ -7,9 +7,7 @@
 # tool, and make sure it's the right version.
 
 from distutils import spawn
-from .exceptions import (ImproperCredentials,
-                        MissingCredentials,
-                        OpenSslFailure)
+from .exceptions import ImproperCredentials, MissingCredentials, OpenSslFailure
 import logging
 from OpenSSL import crypto
 import os
@@ -18,7 +16,8 @@ import subprocess
 import re
 from isign.utils import decode_dict
 
-OPENSSL = os.getenv('OPENSSL', spawn.find_executable('openssl', os.getenv('PATH', '')))
+OPENSSL = os.getenv(
+    'OPENSSL', spawn.find_executable('openssl', os.getenv('PATH', '')))
 # modern OpenSSL versions look like '0.9.8zd'. Use a regex to parse
 OPENSSL_VERSION_RE = re.compile(b'(\d+).(\d+).(\d+)(\w*)')
 MINIMUM_OPENSSL_VERSION = '1.0.1'
@@ -46,7 +45,8 @@ def openssl_command(args, data=None, expect_err=False):
 
     if not expect_err:
         if err is not None and err != '':
-            log.error("Command `{0}` returned error:\n{1}".format(cmd_str, err))
+            log.error(
+                "Command `{0}` returned error:\n{1}".format(cmd_str, err))
 
     if proc.returncode != 0:
         msg = "openssl command `{0}` failed, see log for error".format(cmd_str)
@@ -115,7 +115,7 @@ class Signer(object):
             msg = "Signing may not work: OpenSSL version is {0}, need {1} !"
             log.warn(msg.format(openssl_version, MINIMUM_OPENSSL_VERSION))
 
-    def sign(self, data, digest_algorithm = "sha1"):
+    def sign(self, data, digest_algorithm="sha1"):
         """ sign data, return filehandle """
         cmd = [
             "cms",
@@ -128,7 +128,8 @@ class Signer(object):
             "-md", digest_algorithm
         ]
         signature = openssl_command(cmd, data)
-        log.debug("in length: {}, out length: {}".format(len(data), len(signature)))
+        log.debug(
+            "in length: {}, out length: {}".format(len(data), len(signature)))
         # in some cases we've seen this return a zero length file.
         # Misconfigured machines?
         if len(signature) < 128:
@@ -175,6 +176,7 @@ class Signer(object):
 
     def is_adhoc(self):
         return False
+
 
 class AdhocSigner(Signer):
     def __init__(self):
