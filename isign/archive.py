@@ -258,7 +258,7 @@ class AppZipArchive(Archive):
     def extract_to(self, src, dst='.'):
         zip_ref = zipfile.ZipFile(src, 'r')
         for fileinfo in zip_ref.infolist():
-            filename = fileinfo.filename.encode('cp437').decode()
+            filename = fileinfo.filename
             final_path = os.path.join(dst, filename)
             os.makedirs(os.path.dirname(final_path), exist_ok=True)
             if fileinfo.is_dir():

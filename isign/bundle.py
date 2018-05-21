@@ -45,10 +45,7 @@ class Bundle(object):
     entitlements_path = None  # Not set for every bundle type
 
     def __init__(self, path):
-        try:
-            self.path = path.encode('cp437').decode('utf-8')
-        except UnicodeEncodeError:
-            self.path = path
+        self.path = path
         self.info_path = join(self.path, 'Info.plist')
         if not exists(self.info_path):
             raise NotMatched("no Info.plist found; probably not a bundle")
