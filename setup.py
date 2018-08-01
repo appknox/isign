@@ -34,7 +34,7 @@ setup(
         # 'biplist==0.9',
         'ak-construct==2.5.2',
         'memoizer==0.0.1',
-        'pyOpenSSL==17.2.0',
+        'pyOpenSSL==18.0.0',
         'biplist==1.0.2'
     ],
     package_data={
