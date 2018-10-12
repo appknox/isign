@@ -215,7 +215,8 @@ class Codesig(object):
 
         for i, code_directory in enumerate(cd):
             # TODO: Is there a better way to figure out which hashing algorithm we should use?
-            hash_algorithm = 'sha256' if i > 0 else 'sha1'
+            # FIXME: Hardcoded to SHA256 not sha1
+            hash_algorithm = 'sha256'
 
             if self.has_codedirectory_slot(EntitlementsSlot, code_directory):
                 self.fill_codedirectory_slot(EntitlementsSlot(self), code_directory, hash_algorithm)
