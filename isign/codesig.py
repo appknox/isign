@@ -36,6 +36,8 @@ class ApplicationSlot(CodeDirectorySlot):
     offset = -4
 
     def get_hash(self, hash_algorithm):
+        if (hash_algorithm == 'sha256'):
+            return '\x00' * 32
         return '\x00' * 20
 
 
@@ -78,6 +80,11 @@ class Codesig(object):
 
     def is_sha256_signature(self):
         return self.is_sha256
+
+    def get_hash_type(self, code_directory):
+        if code_directory.get('data', {}).get('hashType') == 2:
+            return 'sha256'
+        return 'sha1'
 
     def build_data(self):
         return macho_cs.Blob.build(self.construct)
@@ -215,7 +222,7 @@ class Codesig(object):
 
         for i, code_directory in enumerate(cd):
             # TODO: Is there a better way to figure out which hashing algorithm we should use?
-            hash_algorithm = 'sha256' if i > 0 else 'sha1'
+            hash_algorithm = self.get_hash_type(code_directory)
 
             if self.has_codedirectory_slot(EntitlementsSlot, code_directory):
                 self.fill_codedirectory_slot(EntitlementsSlot(self), code_directory, hash_algorithm)
@@ -264,7 +271,8 @@ class Codesig(object):
 
         code_directories = self.get_blobs('CSMAGIC_CODEDIRECTORY', min_expected=1, max_expected=2)
         cd_data = self.get_blob_data(code_directories[0])
-        sig = signer.sign(cd_data, 'sha1')
+        hash_algorithm = self.get_hash_type(code_directories[0])
+        sig = signer.sign(cd_data, hash_algorithm)
         # log.debug("sig len: {0}".format(len(sig)))
         # log.debug("old sig len: {0}".format(len(oldsig)))
         # open("my_sigrip.der", "wb").write(sig)
