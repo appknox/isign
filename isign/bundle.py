@@ -194,6 +194,34 @@ class Framework(Bundle):
     def __init__(self, path):
         super(Framework, self).__init__(path)
 
+    def sign(self, deep, signer):
+        """ Sign everything in the framework.  If deep is specified, sign
+        recursively with sub-bundles """
+        if deep:
+            frameworks_path = join(self.path, 'Frameworks')
+            if exists(frameworks_path):
+                for framework_name in os.listdir(frameworks_path):
+                    framework_path = join(frameworks_path, framework_name)
+                    try:
+                        framework = Framework(framework_path)
+                        framework.resign(deep, signer)
+                    except NotMatched:
+                        continue
+                self.sign_dylibs(signer, frameworks_path)
+                
+        try:
+            executable_path = self.get_executable_path()
+        except Exception as e:
+            executable_path = None
+        
+        # Sign only if executable exist
+        if executable_path:
+            self.seal_path = code_resources.make_seal(
+                executable_path,self.path
+            )
+            executable = self.signable_class(self, executable_path, signer)
+            executable.sign(self, signer)
+
 
 class App(Bundle):
     """ The kind of bundle that is visible as an app to the user.
