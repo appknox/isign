@@ -35,7 +35,7 @@ setup(
         'ak-construct==2.5.2',
         'memoizer==0.0.1',
         'pyOpenSSL==18.0.0',
-        'biplist==1.0.2'
+        'biplist==1.0.3'
     ],
     package_data={
         'isign': ['apple_credentials/applecerts.pem',
