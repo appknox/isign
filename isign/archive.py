@@ -164,7 +164,7 @@ class AppZipArchive(Archive):
         should be re-zipped. """
     app_dir_pattern = r'^([^/]+\.app/).*$'
     extensions = ['.zip']
-    helpers = ['zip', 'unzip']
+    helpers = []
 
     @classmethod
     def is_helpers_present(cls):
