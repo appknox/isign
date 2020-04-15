@@ -134,6 +134,10 @@ class ResourceBuilder(object):
                                                                     filename)
                 # log.debug(rule_debug_fmt.format(rule, path, relative_path))
 
+                # specifically ignore the CodeResources symlink in base directory if it exists (iOS 11+ fix)
+                if relative_path == "CodeResources" and os.path.islink(path):
+                    continue
+
                 # There's no rule for the Entitlements.plist file which we
                 # generate temporarily so we just ommit the file as a special
                 # case...
