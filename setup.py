@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 
 HERE = path.abspath(path.dirname(__file__))
 
-__version__ = "0.10.16"
+__version__ = "0.10.17"
 PACKAGE_NAME = "ak_isign"
 
 
