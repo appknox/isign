@@ -176,7 +176,7 @@ class Signable(object, metaclass=ABCMeta):
         # TODO: we assume that if any slice is unsigned, all slices are.  This should be true in practice but
         # we should still guard against this.
         if self.sign_from_scratch and 'FatArch' in self.m.data:
-            assert len(self.arches) >= 2
+            assert len(self.arches) >= 1
 
             # todo(markwang): Update fat headers and mach_start for each slice if needewd
             log.debug('signing fat binary from scratch')
